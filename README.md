@@ -1,0 +1,2 @@
+# SecondsKill
+一个由springboot、JSR303、Mybatis作为后端，Thymeleaf、BootStrap和JQuery为前端，RabbitMQ、Redis和Druid作为中间件的高并发秒杀系统
