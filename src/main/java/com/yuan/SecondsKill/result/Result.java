@@ -1,6 +1,5 @@
 package com.yuan.SecondsKill.result;
 
-import com.sun.tools.javac.jvm.Code;
 
 public class Result<T>{
     private int code;
@@ -12,6 +11,12 @@ public class Result<T>{
      */
     public static <T> Result<T> success(T data){
         return new Result<T>(data);
+    }
+    /**
+     * 失败时候的调用
+     */
+    public static <T> Result<T> error(CodeMsg codeMsg){
+        return new Result<T>(codeMsg);
     }
 
 
