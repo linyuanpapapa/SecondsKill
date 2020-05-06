@@ -34,7 +34,7 @@ public class LoginController{
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(HttpServletResponse response, @Valid LoginVo loginVo){
+    public Result<String> doLogin(HttpServletResponse response, @Valid LoginVo loginVo){
         log.info(loginVo.toString());
         /*//参数校验
         String mobile=loginVo.getMobile();
@@ -50,7 +50,7 @@ public class LoginController{
             return Result.error(CodeMsg.PASSWORD_EMPTY);
         }*/
         //登录
-        killsUserService.login(response,loginVo);
-        return Result.success(true);
+        String token=killsUserService.login(response,loginVo);
+        return Result.success(token);
     }
 }

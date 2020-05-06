@@ -7,6 +7,7 @@ import com.yuan.SecondsKill.domain.KillsUser;
 import com.yuan.SecondsKill.exception.GlobalException;
 import com.yuan.SecondsKill.redis.KillsUserKey;
 import com.yuan.SecondsKill.redis.RedisService;
+import com.yuan.SecondsKill.redis.UserKey;
 import com.yuan.SecondsKill.result.CodeMsg;
 import com.yuan.SecondsKill.util.MD5Util;
 import com.yuan.SecondsKill.util.UUIDUtil;
@@ -28,7 +29,7 @@ public class KillsUserServiceImpl implements KillsUserService {
     RedisService redisService;
 
     @Override
-    public boolean login(HttpServletResponse response,LoginVo loginVo) {
+    public String login(HttpServletResponse response,LoginVo loginVo) {
         if(loginVo==null) throw new GlobalException(CodeMsg.SERVER_ERROR);
         String id=loginVo.getMobile();
         String formPass=loginVo.getPassword();
@@ -45,9 +46,27 @@ public class KillsUserServiceImpl implements KillsUserService {
         //生成cookie
         String token = UUIDUtil.uuid();
         addCookie(response,token,user);
-        return true;
+        return token;
     }
 
+    public KillsUser getById(long id){
+        //取缓存
+        KillsUser user=redisService.get(KillsUserKey.getById,""+id,KillsUser.class);
+        if(user!=null){
+            return user;
+        }
+        //缓存为空，查数据库
+        user = killsUserDao.selectById(id);
+        redisService.set(KillsUserKey.getById,""+id,user);
+        return user;
+    }
+
+    /**
+     * 对象缓存，由token取出对象
+     * @param response
+     * @param token
+     * @return
+     */
     @Override
     public KillsUser getByToken(HttpServletResponse response,String token) {
         if(StringUtils.isEmpty(token)){
@@ -59,7 +78,25 @@ public class KillsUserServiceImpl implements KillsUserService {
         return user;
     }
 
+    public boolean updatePassword(String token,long id,String formPass){
+        //取User
+        KillsUser user=getById(id);
+        if(user==null){
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
+        }
+        KillsUser newUser=new KillsUser();
+        newUser.setId(id);
+        newUser.setPassword(MD5Util.FormpassToDbpass(formPass,user.getSalt()));
+        killsUserDao.update(newUser);
+        //处理缓存
+        redisService.delete(KillsUserKey.getById,""+id);
+        user.setPassword(newUser.getPassword());
+        redisService.set(KillsUserKey.token,token,user);
+        return true;
+    }
+
     private void addCookie(HttpServletResponse response,String token,KillsUser user){
+        //为token加上前缀
         redisService.set(KillsUserKey.token,token,user);
         Cookie cookie=new Cookie(COOKIE_NAME_TOKEN,token);
         cookie.setMaxAge(KillsUserKey.token.expireSeconds());

@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 public interface KillsUserService {
 
 
-    boolean login(HttpServletResponse response,LoginVo loginVo);
+    String login(HttpServletResponse response,LoginVo loginVo);
 
     KillsUser getByToken(HttpServletResponse response,String token);
+
+    KillsUser getById(long id);
+
 }

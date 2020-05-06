@@ -16,6 +16,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 对Controller中的执行方法的参数进行注入
+ * 与实现了WebMvcConfigurerAdapter接口的类进行配合
+ */
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     @Autowired
@@ -32,8 +36,10 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
               ModelAndViewContainer modelAndViewContainer,
               NativeWebRequest nativeWebRequest,
               WebDataBinderFactory webDataBinderFactory) throws Exception {
+        //获取Cookie和Session
         HttpServletRequest request=nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         HttpServletResponse response=nativeWebRequest.getNativeResponse(HttpServletResponse.class);
+
         String paramToken = request.getParameter(KillsUserServiceImpl.COOKIE_NAME_TOKEN);
         String cookieToken=getCookieValue(request,KillsUserServiceImpl.COOKIE_NAME_TOKEN);
 
@@ -46,6 +52,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
         Cookie[] cookies = request.getCookies();
+        if(cookies==null||cookies.length==0) return null;
         for(Cookie cookie:cookies){
             if(cookie.getName().equals(cookieNameToken)){
                 return cookie.getValue();

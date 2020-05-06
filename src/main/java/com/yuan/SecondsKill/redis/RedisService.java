@@ -35,8 +35,8 @@ public class RedisService {
 
     /**
      * 设置对象
-     * @param prefix
-     * @param key
+     * @param prefix 目前是tk
+     * @param key token
      * @param value
      * @param <T>
      * @return
@@ -74,6 +74,25 @@ public class RedisService {
             //获取有前缀的key
             String realKey=prefix.getPrefix()+key;
             return jedis.exists(realKey);
+        }finally{
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 删除缓存
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public boolean delete(KeyPrefix prefix,String key){
+        Jedis jedis=null;
+        try{
+            jedis=jedisPool.getResource();
+            //获取有前缀的key
+            String realKey=prefix.getPrefix()+key;
+            Long del = jedis.del(realKey);
+            return del>0;
         }finally{
             returnToPool(jedis);
         }

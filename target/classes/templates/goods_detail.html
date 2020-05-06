@@ -47,7 +47,7 @@
             <td>
                 <form id="miaoshaForm" method="post" action="/miaosha/do_miaosha">
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                    <input type="hidden" name="goodsId" th:value="${goods. id}"/>
+                    <input type="hidden" name="goodsId" th:value="${goods.id}"/>
                 </form>
             </td>
         </tr>
@@ -88,7 +88,7 @@ function countDown(){
         }
         $("#miaoshaTip").html("秒杀进行中");
     }else{//秒杀已经结束
-        $("#buyButton").attr("disabled",false);
+        $("#buyButton").attr("disabled",true);
         $("#miaoshaTip").html("秒杀已经结束");
     }
 }

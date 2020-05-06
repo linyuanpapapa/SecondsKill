@@ -6,4 +6,5 @@ public class KillsUserKey extends BasePrefix{
         super(expireSeconds,prefix);
     }
     public static KillsUserKey token=new KillsUserKey(TOKEN_EXPIRESECONDS,"tk");
+    public static KillsUserKey getById=new KillsUserKey(0,"id");
 }
